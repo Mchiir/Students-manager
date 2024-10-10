@@ -19,11 +19,12 @@ public class Main {
 
         while (true) {
             System.out.println("\nWelcome to Student Management System");
-            System.out.println("1. Get students");
-            System.out.println("2. Insert student");
-            System.out.println("3. Remove students");
-            System.out.println("4. Edit a student");
-            System.out.println("9. Exit the program");
+            System.out.println("1. Get students.");
+            System.out.println("2. Insert student.");
+            System.out.println("3. Remove students.");
+            System.out.println("4. Edit a student.");
+            System.out.println("5. Update the system's data.");
+            System.out.println("9. Exit the program.");
 
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -31,6 +32,7 @@ public class Main {
             switch (choice) {
                 case 1:
                     read.displayMenu();
+                    update.syncData();
                     break;
                 case 2:
                 	insert.menu();
@@ -44,6 +46,10 @@ public class Main {
                    edit.displayMenu();
                     update.syncData();
                     break;
+                case 5:
+                     update.syncData();
+                     System.out.println("System'data successfully updated.");
+                     break;
                 case 9:
                     System.out.println("Goodbye!");
                     connectMongo.getMongoClient().close();

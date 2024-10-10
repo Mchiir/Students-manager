@@ -19,10 +19,10 @@ public class Remove {
 
     public void displayMenu() {
         System.out.println("Choose how to remove students:");
-        System.out.println("1. Remove All");
-        System.out.println("2. Remove Last (Stack LIFO)");
-        System.out.println("3. Remove First (Queue FIFO)");
-        System.out.println("8. Exit");
+        System.out.println("1. Remove All.");
+        System.out.println("2. Remove Last.");
+        System.out.println("3. Remove First.");
+        System.out.println("8. Exit.");
 
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -51,7 +51,6 @@ public class Remove {
         return confirmation.isEmpty() || confirmation.equalsIgnoreCase("Y");
     }
 
-    // Method for confirming and removing all students
     public void confirmRemoveAll() {
         if (confirmRemoval()) {
             removeAll();
@@ -60,15 +59,13 @@ public class Remove {
         }
     }
 
-    // Method for removing all students
     public void removeAll() {
-        connectMongo.getCollection().deleteMany(new Document()); // Clear all documents in MongoDB
+        connectMongo.getCollection().deleteMany(new Document());
         studentStack.clear(); 
         studentQueue.clear(); 
         System.out.println("All students removed from the database and local storage.");
     }
 
-    // Method for confirming and removing the last student
     public void confirmRemoveLast() {
         if (confirmRemoval()) {
             removeLast();
@@ -77,7 +74,6 @@ public class Remove {
         }
     }
 
-    // Method for removing the last student (LIFO)
     public void removeLast() {
         if (!studentStack.isEmpty()) {
             Document removedStudent = studentStack.pop();
@@ -88,7 +84,6 @@ public class Remove {
         }
     }
 
-    // Method for confirming and removing the first student
     public void confirmRemoveFirst() {
         if (confirmRemoval()) {
             removeFirst();
@@ -97,7 +92,6 @@ public class Remove {
         }
     }
 
-    // Method for removing the first student (FIFO)
     public void removeFirst() {
         if (!studentQueue.isEmpty()) {
             Document removedStudent = studentQueue.poll();

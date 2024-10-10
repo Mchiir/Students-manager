@@ -28,9 +28,9 @@ public class Insert {
 
     public void menu() {
         System.out.println("\n--- Student Menu ---");
-        System.out.println("1. Insert manually");
-        System.out.println("2. Insert by file (path)");
-        System.out.println("3. Home.");
+        System.out.println("1. Insert manually.");
+        System.out.println("2. Insert by file (path).");
+        System.out.println("3. Return to Home.");
 
         String choice = scanner.nextLine();
 
@@ -39,7 +39,7 @@ public class Insert {
                 addStudent();
                 break;
             case "2":
-                System.out.println("Enter the file path:");
+                System.out.println("Enter the file path: ");
                 String filePath = scanner.nextLine();
                 if (isValidFilePath(filePath)) {
                     addStudent(filePath);
@@ -65,14 +65,12 @@ public class Insert {
         System.out.println("Combination: ");
         String combination = scanner.nextLine();
         System.out.println("Level (0, 1, ...): ");
-        int level = Integer.parseInt(scanner.nextLine()); // Convert to int
+        int level = Integer.parseInt(scanner.nextLine());
         System.out.println("Date of birth (YYYY-MM-DD): ");
         String dobString = scanner.nextLine();
 
-        // Convert String to Date
         Date dob = Date.valueOf(dobString);
 
-        // Calculate age
         int age = calculateAge(dob);
 
         Document student = new Document("Firstname", firstname)
@@ -89,7 +87,6 @@ public class Insert {
         System.out.println("Student added successfully!");
     }
 
-    // File entry for students
     public void addStudent(String filePath) {
         try (FileInputStream fis = new FileInputStream(filePath)) {
             Workbook workbook = new XSSFWorkbook(fis);
@@ -99,7 +96,6 @@ public class Insert {
             int firstnameIndex = -1, lastnameIndex = -1, schoolIndex = -1;
             int combinationIndex = -1, levelIndex = -1, dobIndex = -1;
 
-            // Identify column indexes for each header
             for (Cell cell : headerRow) {
                 String header = cell.getStringCellValue();
                 switch (header.toLowerCase()) {
@@ -131,7 +127,6 @@ public class Insert {
                 return;
             }
 
-            // Read rows and insert each student
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {
@@ -142,18 +137,16 @@ public class Insert {
                     int level = (int) row.getCell(levelIndex).getNumericCellValue(); // Get as numeric
                     String dobString = row.getCell(dobIndex).getStringCellValue();
 
-                    // Convert String to Date
                     Date dob = Date.valueOf(dobString);
 
-                    // Calculate age
                     int age = calculateAge(dob);
 
                     Document student = new Document("Firstname", firstname)
                                           .append("Lastname", lastname)
                                           .append("School", school)
                                           .append("Combination", combination)
-                                          .append("Level", level) // Store level as a number
-                                          .append("Age", age); // Store age instead of DOB
+                                          .append("Level", level)
+                                          .append("Age", age);
 
                     collection.insertOne(student);
                 }
@@ -181,7 +174,6 @@ public class Insert {
         return studentQueue;
     }
 
-    // Method to calculate age from Date of Birth
     public int calculateAge(Date dob) {
         Calendar dobCal = Calendar.getInstance();
         dobCal.setTime(dob);
@@ -189,7 +181,6 @@ public class Insert {
 
         int age = today.get(Calendar.YEAR) - dobCal.get(Calendar.YEAR);
         
-        // Adjust age if the current date is before the birthday in the current year
         if (today.get(Calendar.MONTH) < dobCal.get(Calendar.MONTH) || 
             (today.get(Calendar.MONTH) == dobCal.get(Calendar.MONTH) && today.get(Calendar.DAY_OF_MONTH) < dobCal.get(Calendar.DAY_OF_MONTH))) {
             age--;

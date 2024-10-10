@@ -1,6 +1,7 @@
 package javaMongo;
 
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.Queue;
 import java.util.Stack;
 import org.bson.Document;
@@ -8,23 +9,25 @@ import java.util.Scanner;
 
 public class Edit {
 
-    private Stack<Document> studentStack = Insert.getStudentStack();
-    private Queue<Document> studentQueue = Insert.getStudentQueue();
-    private ConnectMongo connectMongo;
+    private Stack<Document> studentStack;
+    private Queue<Document> studentQueue;
+    private ConnectMongo conn;
     private Scanner scanner;
 
-    public Edit(Scanner scanner, ConnectMongo connectMongo) {
+    public Edit(Scanner scanner, ConnectMongo conn) {
         this.scanner = scanner;
-        this.connectMongo = connectMongo;
+        this.conn = conn;
+        this.studentStack = Insert.getStudentStack();
+        this.studentQueue = Insert.getStudentQueue();
     }
 
     public void displayMenu() {
-        System.out.println("Choose how to edit a student:");
-        System.out.println("1. Edit Last (Stack LIFO)");
-        System.out.println("2. Edit First (Queue FIFO)");
-        System.out.println("3. Edit by Index (Stack)");
-        System.out.println("4. Edit by Index (Queue)");
-        System.out.println("5. Exit the program.");
+        System.out.println("\n--- Edit Student Menu ---");
+        System.out.println("1. Edit Last.");
+        System.out.println("2. Edit First.");
+        System.out.println("3. Edit by Stack Index.");
+        System.out.println("4. Edit by Queue Index.");
+        System.out.println("5. Exit.");
 
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -45,7 +48,8 @@ public class Edit {
             case 5:
                 return;
             default:
-                System.out.println("Invalid option.");
+                System.out.println("Invalid option. Try again.");
+                displayMenu();
         }
     }
 
@@ -53,7 +57,7 @@ public class Edit {
         if (!studentStack.isEmpty()) {
             Document student = studentStack.pop();
             editStudent(student);
-            studentStack.push(student); // Restore the original student after editing
+            studentStack.push(student);
         } else {
             System.out.println("No students available.");
         }
@@ -63,7 +67,7 @@ public class Edit {
         if (!studentQueue.isEmpty()) {
             Document student = studentQueue.poll();
             editStudent(student);
-            studentQueue.offer(student); // Restore the original student after editing
+            studentQueue.offer(student);
         } else {
             System.out.println("No students available.");
         }
@@ -77,7 +81,6 @@ public class Edit {
         if (index >= 0 && index < studentStack.size()) {
             Document student = (Document) studentStack.toArray()[index];
             editStudent(student);
-            // Update the stack after editing
         } else {
             System.out.println("Invalid index.");
         }
@@ -91,7 +94,6 @@ public class Edit {
         if (index >= 0 && index < studentQueue.size()) {
             Document student = (Document) studentQueue.toArray()[index];
             editStudent(student);
-            // Update the queue after editing
         } else {
             System.out.println("Invalid index.");
         }
@@ -100,17 +102,34 @@ public class Edit {
     private void editStudent(Document student) {
         System.out.println("Editing student: " + student.toJson());
 
-        String name = promptForInput("Enter new name:", student.getString("Firstname"));
-        String dobInput = promptForInput("Enter new Date of Birth (yyyy-MM-dd): ", student.getDate("DateOfBirth").toString());
+        String firstname = promptForInput("Enter new Firstname:", student.getString("Firstname"));
+        String lastname = promptForInput("Enter new Lastname:", student.getString("Lastname"));
+        String school = promptForInput("Enter new School:", student.getString("School"));
+        String combination = promptForInput("Enter new Combination:", student.getString("Combination"));
+        String levelInput = promptForInput("Enter new Level (0, 1, ...):", String.valueOf(student.getInteger("Level")));
+        
+        int currentAge = student.getInteger("Age");
+        String dobInput = promptForInput("Enter new Date of Birth (yyyy-MM-dd):", currentAge > 0 ? calculateDobFromAge(currentAge).toString() : "");
 
         try {
-            Date dob = Date.valueOf(dobInput);
-            int age = new Insert(scanner).calculateAge(dob);
+            Date dob;
+            if (!dobInput.isEmpty()) {
+                dob = Date.valueOf(dobInput);
+            } else {
+                dob = calculateDobFromAge(currentAge);
+            }
 
-            student.put("Firstname", name);
+            int age = calculateAge(dob);
+            int level = Integer.parseInt(levelInput);
+
+            student.put("Firstname", firstname);
+            student.put("Lastname", lastname);
+            student.put("School", school);
+            student.put("Combination", combination);
+            student.put("Level", level);
             student.put("Age", age);
 
-            connectMongo.getCollection().updateOne(
+            conn.getCollection().updateOne(
                 new Document("_id", student.getObjectId("_id")),
                 new Document("$set", student)
             );
@@ -125,5 +144,26 @@ public class Edit {
         System.out.println(prompt + " (Press Enter to keep '" + defaultValue + "'):");
         String input = scanner.nextLine();
         return input.isEmpty() ? defaultValue : input;
+    }
+
+    private Date calculateDobFromAge(int age) {
+        Calendar today = Calendar.getInstance();
+        today.add(Calendar.YEAR, -age);
+        return new Date(today.getTimeInMillis());
+    }
+
+    public int calculateAge(Date dob) {
+        Calendar dobCal = Calendar.getInstance();
+        dobCal.setTime(dob);
+        Calendar today = Calendar.getInstance();
+
+        int age = today.get(Calendar.YEAR) - dobCal.get(Calendar.YEAR);
+        
+        if (today.get(Calendar.MONTH) < dobCal.get(Calendar.MONTH) || 
+            (today.get(Calendar.MONTH) == dobCal.get(Calendar.MONTH) && today.get(Calendar.DAY_OF_MONTH) < dobCal.get(Calendar.DAY_OF_MONTH))) {
+            age--;
+        }
+        
+        return age;
     }
 }

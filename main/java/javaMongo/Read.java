@@ -17,9 +17,10 @@ public class Read {
 
     public void displayMenu() {
         System.out.println("Choose how to get students:");
-        System.out.println("1. Get All");
-        System.out.println("2. Get Last (Stack LIFO)");
-        System.out.println("3. Get First (Queue FIFO)");
+        System.out.println("1. Get All.");
+        System.out.println("2. Get Last.");
+        System.out.println("3. Get First.");
+        System.out.println("4. Return to Home.");
 
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -34,6 +35,8 @@ public class Read {
             case 3:
                 getFirst();
                 break;
+            case 4:
+                return;
             default:
                 System.out.println("Invalid option.");
         }
@@ -44,7 +47,7 @@ public class Read {
             System.out.println("No students available in stack.");
             return;
         }
-        System.out.println("All students in stack (LIFO):");
+        System.out.println("All students in stack: ");
         for (Document student : studentStack) {
             System.out.println(student.toJson());
         }
@@ -52,7 +55,7 @@ public class Read {
 
     public void getLast() {
         if (!studentStack.isEmpty()) {
-            System.out.println("Last student (LIFO): " + studentStack.peek().toJson());
+            System.out.println("Last student : " + studentStack.peek().toJson());
         } else {
             System.out.println("No students available.");
         }
@@ -60,7 +63,7 @@ public class Read {
 
     public void getFirst() {
         if (!studentQueue.isEmpty()) {
-            System.out.println("First student (FIFO): " + studentQueue.peek().toJson());
+            System.out.println("First student : " + studentQueue.peek().toJson());
         } else {
             System.out.println("No students available.");
         }

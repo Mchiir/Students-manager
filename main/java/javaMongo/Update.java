@@ -19,25 +19,21 @@ public class Update {
     }
 
     public void syncData() {
-        // Retrieve data from the database
-        Set<Document> dbStudents = new HashSet<>(connectMongo.getCollection().find().into(new ArrayList<>()));
+        ArrayList<Document> dbStudentsList = connectMongo.getCollection().find().into(new ArrayList<>());
 
-        // Retrieve data from stack and queue
+        Set<Document> dbStudents = new HashSet<>(dbStudentsList);
+
         Set<Document> stackStudents = new HashSet<>(studentStack);
         Set<Document> queueStudents = new HashSet<>(studentQueue);
 
-        // Combine stack and queue students
         Set<Document> localStudents = new HashSet<>(stackStudents);
         localStudents.addAll(queueStudents);
 
-        // Compare and update
         if (!dbStudents.equals(localStudents)) {
-            // Clear the existing stack and queue
             studentStack.clear();
             studentQueue.clear();
 
-            // Add all documents from the database to the stack and queue
-            for (Document student : dbStudents) {
+            for (Document student : dbStudentsList) {
                 studentStack.push(student);
                 studentQueue.offer(student);
             }
