@@ -18,12 +18,12 @@ import java.util.Stack;
 public class Insert {
     private static Stack<Document> studentStack = new Stack<>();
     private static Queue<Document> studentQueue = new LinkedList<>();
-    private ConnectMongo conn = new ConnectMongo();
-    private MongoCollection<Document> collection = conn.getCollection();
+    private MongoCollection<Document> collection;
     private Scanner scanner;
 
-    public Insert(Scanner scanner) {
+    public Insert(Scanner scanner, ConnectMongo connectMongo) {
         this.scanner = scanner;
+        this.collection = connectMongo.getCollection();
     }
 
     public void menu() {
@@ -54,7 +54,6 @@ public class Insert {
         }
     }
 
-    // Manual student entry
     public void addStudent() {
         System.out.println("Firstname: ");
         String firstname = scanner.nextLine();
@@ -77,8 +76,8 @@ public class Insert {
                               .append("Lastname", lastname)
                               .append("School", school)
                               .append("Combination", combination)
-                              .append("Level", level) // Store level as a number
-                              .append("Age", age); // Store age instead of DOB
+                              .append("Level", level)
+                              .append("Age", age);
 
         collection.insertOne(student);
         studentStack.push(student);
@@ -178,7 +177,7 @@ public class Insert {
         Calendar dobCal = Calendar.getInstance();
         dobCal.setTime(dob);
         Calendar today = Calendar.getInstance();
-
+        
         int age = today.get(Calendar.YEAR) - dobCal.get(Calendar.YEAR);
         
         if (today.get(Calendar.MONTH) < dobCal.get(Calendar.MONTH) || 

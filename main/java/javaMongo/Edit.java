@@ -7,7 +7,7 @@ import java.util.Stack;
 import org.bson.Document;
 import java.util.Scanner;
 
-public class Edit {
+public class Edit extends Insert {
 
     private Stack<Document> studentStack;
     private Queue<Document> studentQueue;
@@ -15,6 +15,7 @@ public class Edit {
     private Scanner scanner;
 
     public Edit(Scanner scanner, ConnectMongo conn) {
+    	super(scanner, conn);
         this.scanner = scanner;
         this.conn = conn;
         this.studentStack = Insert.getStudentStack();
@@ -150,20 +151,5 @@ public class Edit {
         Calendar today = Calendar.getInstance();
         today.add(Calendar.YEAR, -age);
         return new Date(today.getTimeInMillis());
-    }
-
-    public int calculateAge(Date dob) {
-        Calendar dobCal = Calendar.getInstance();
-        dobCal.setTime(dob);
-        Calendar today = Calendar.getInstance();
-
-        int age = today.get(Calendar.YEAR) - dobCal.get(Calendar.YEAR);
-        
-        if (today.get(Calendar.MONTH) < dobCal.get(Calendar.MONTH) || 
-            (today.get(Calendar.MONTH) == dobCal.get(Calendar.MONTH) && today.get(Calendar.DAY_OF_MONTH) < dobCal.get(Calendar.DAY_OF_MONTH))) {
-            age--;
-        }
-        
-        return age;
     }
 }

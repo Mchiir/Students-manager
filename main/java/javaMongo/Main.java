@@ -6,8 +6,8 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ConnectMongo connectMongo = new ConnectMongo();
-        Insert insert = new Insert(scanner);
+        ConnectMongo connectMongo = ConnectMongo.getInstance();
+        Insert insert = new Insert(scanner, connectMongo);
         
         Read read = new Read(scanner);
         Remove remove = new Remove(scanner, connectMongo);
@@ -48,7 +48,7 @@ public class Main {
                     break;
                 case 5:
                      update.syncData();
-                     System.out.println("System'data successfully updated.");
+                     System.out.println("System's data successfully updated.");
                      break;
                 case 9:
                     System.out.println("Goodbye!");

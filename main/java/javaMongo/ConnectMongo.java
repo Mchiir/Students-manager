@@ -7,11 +7,12 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
 public class ConnectMongo {
+	private static ConnectMongo instance = null;
 	private MongoClient mongoClient;
 	private MongoDatabase database;
 	private MongoCollection<Document> collection;
 	
-	 public ConnectMongo() {
+	 private ConnectMongo() {
 	        try {
 	            mongoClient = MongoClients.create("mongodb://localhost:27017");
 	            database = mongoClient.getDatabase("students");
@@ -23,6 +24,13 @@ public class ConnectMongo {
 	        }
 	    }
 
+	 public static ConnectMongo getInstance() {
+	        if (instance == null) {
+	            instance = new ConnectMongo();
+	        }
+	        return instance;
+	}
+	 
 	public MongoClient getMongoClient() {
 		return mongoClient;
 	}
